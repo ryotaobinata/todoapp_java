@@ -30,6 +30,14 @@ public class Task {
 		this.isCompleted=false;
 	}
 	
+	public Task(int id, String title, LocalDate due_date, String description, boolean isDone) {
+		this.id=id;
+		this.title=title;
+		this.deadLine=due_date;
+		this.info=description;
+		this.isCompleted=isDone;
+	}
+
 	public String getTitle() {
 		return this.title;
 	}
