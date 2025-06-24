@@ -38,7 +38,14 @@ public class MainController {
 	@FXML private DatePicker taskDeadline=new DatePicker();
 	@FXML private Button closeButton=new Button();
 	
-	private ObservableList<Task> itemList=FXCollections.observableArrayList();
+	//現在詳細表示中のタスク
+	private Task nowViewTask;
+	
+	//タスクマネージャー
+	private TaskManager taskManager;
+	
+	//private ObservableList<Task> itemList=FXCollections.observableArrayList();
+	private ObservableList<Task> itemList;
 	
 	/*
 	 * タスクの追加、削除、完了をチェックしたとき
@@ -49,20 +56,26 @@ public class MainController {
 	
 	
 	@FXML public void initialize() {
+		
+		//タスクマネージャーのインスタンス化
+		taskManager=new TaskManager();
+		//ObservavleListの生成
+		itemList=FXCollections.observableArrayList(taskManager.geTasks());
+		//ListViewの生成・設定
 		taskListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 		taskListView.setItems(itemList);
 		taskListView.setCellFactory(lv->{
 			return new ListCell<Task>(){
 				private final CheckBox checkBox=new CheckBox();
 				private final HBox content=new HBox(10);
-				//private final Button deleteButton=new Button("詳細");
+				private final Button descriptionButton=new Button("詳細");
 				private final Region spacer=new Region();
 				private final Label taskName=new Label();
 				
 				{
 					content.setAlignment(Pos.CENTER_LEFT);
 					HBox.setHgrow(spacer, Priority.ALWAYS);
-					content.getChildren().addAll(taskName,spacer,checkBox);
+					content.getChildren().addAll(taskName,spacer,checkBox,descriptionButton);
 					
 					checkBox.setOnAction(e->{
 						Task task=getItem();
@@ -73,10 +86,29 @@ public class MainController {
 							}else {
 								checkBox.setText("未完了");
 							}
+							taskManager.update(task);
 						}
 						
 					});
 					
+					descriptionButton.setOnAction(e->{
+						Task task=getItem();
+						nowViewTask=task;
+						taskTitle.setText(task.getTitle());
+						
+						if (task.getInfo()!=null) {							
+							description.setText(task.getInfo());
+						}else {
+							description.clear();
+						}
+						
+						if (task.getDeadLine()!=null) {
+							taskDeadline.setValue(task.getDeadLine());
+						}else {
+							taskDeadline.setValue(null);
+						}
+						taskCard.setVisible(true);
+					});
 					
 				}
 				
@@ -107,6 +139,11 @@ public class MainController {
 		if (!taskInputField.getText().isEmpty()) {
 			Task newTask=new Task();
 			newTask.setTitle(taskInputField.getText());
+			
+			//データベースへ登録(insert)
+			newTask.setId(taskManager.insert(newTask));
+			
+			
 			itemList.add(newTask);
 			System.out.println(taskInputField.getText());
 			taskInputField.clear();
@@ -115,10 +152,15 @@ public class MainController {
 	
 	@FXML public void onRemoveTaskClicked() {
 		//削除する際にインデックスが変わらないように、逆順に並べる
-		List<Integer> selectedItems=new ArrayList<Integer>(taskListView.getSelectionModel().getSelectedIndices().sorted(Comparator.reverseOrder()));
+		List<Integer> selectedItemsIndex=new ArrayList<Integer>(taskListView.getSelectionModel().getSelectedIndices().sorted(Comparator.reverseOrder()));
+		List<Task> selectedItems=new ArrayList<Task>(taskListView.getSelectionModel().getSelectedItems());
 		
+		//データベースの要素を削除
+		taskManager.delete(selectedItems);
+		
+		//アプリ側の要素を削除
 		if (selectedItems!=null) {			
-			for (int index : selectedItems) {
+			for (int index : selectedItemsIndex) {
 				itemList.remove(index);
 			}
 		}
@@ -134,8 +176,10 @@ public class MainController {
 	//詳細カードの設定
 	@FXML public void onCloseTaskCard() {
 		taskCard.setVisible(false);
-		
-		//必要であればタスクを保存する処理を記述
+		nowViewTask.setInfo(description.getText());
+		nowViewTask.setDeadLine(taskDeadline.getValue());
+		//必要であればタスクを保存する処理を記述(update)
+		taskManager.update(nowViewTask);
 	}
 	
 	
