@@ -56,6 +56,7 @@ Java で作成したシンプルな Todo リスト管理アプリです。日々
 ## 📁 実行方法
 
 ```bash
-git clone https://github.com/yourusername/todo-java-app.git
+git clone https://github.com/ryotaobinata/todo-java-arpp.git
 cd todo-java-app
+//mavenをインストール後
 mvn clean javafx:run
