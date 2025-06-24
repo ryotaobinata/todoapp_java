@@ -26,11 +26,21 @@ Java で作成したシンプルな Todo リスト管理アプリです。日々
 
 ## 🎬 プレビュー
 
-> 🔽 実際の動作の様子はこちら：<br>
-[タスクの追加](assets/add_task.gif)<br>
-[タスクの詳細](assets/description.gif)<br>
-[タスクの削除](remove_task.gif)<br>
-（ここに動画やGIF、もしくは YouTube リンクを貼ってください）
+> 🔽 実際の動作の様子はこちら：
+
+<h2>タスクの追加<h2>
+<div align="center">
+  <img src="assets/add_task.gif" alt="タスクの追加" width="200" /><br>
+</div>
+<h2>タスクの詳細<h2>
+<div align="center">
+  <img src="assets/description.gif" alt="タスクの詳細" width="200" /><br>
+</div>
+<h2>タスクの削除<h2>
+<div align="center">
+  <img src="assets/remove_task.gif" alt="タスクの削除" width="200" /><br>
+</div>
+
 
 ---
 
